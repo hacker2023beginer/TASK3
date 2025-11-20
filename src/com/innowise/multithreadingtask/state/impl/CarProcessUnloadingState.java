@@ -8,23 +8,26 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.TimeUnit;
 
-
 public class CarProcessUnloadingState implements CarProcessState {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger(CarProcessUnloadingState.class);
+
     @Override
     public void doProcess(Car car) {
-        logger.info("Processing Car");
         Port port = car.getPort();
         int index = car.getCarCapacity();
-        while (index > 0){
+        logger.info("Car {} started unloading process with {} containers", car.getName(), index);
+        while (index > 0) {
             port.addContainer();
-            logger.debug("Add container");
+            logger.info("Car {} unloaded one container. Containers in port now: {}",
+                    car.getName(), port.getContainers().get());
             try {
                 TimeUnit.MILLISECONDS.sleep(500);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                logger.warn("Car {} interrupted during unloading", car.getName());
             }
             index--;
         }
+        logger.info("Car {} finished unloading process", car.getName());
     }
 }

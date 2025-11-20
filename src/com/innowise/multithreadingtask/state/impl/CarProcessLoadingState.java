@@ -9,21 +9,25 @@ import org.apache.logging.log4j.Logger;
 import java.util.concurrent.TimeUnit;
 
 public class CarProcessLoadingState implements CarProcessState {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger(CarProcessLoadingState.class);
+
     @Override
     public void doProcess(Car car) {
         Port port = car.getPort();
         int index = car.getCarCapacity();
-        while (index > 0){
-            System.out.println("Containers {} needed" + index);
+        logger.info("Car {} started loading process with capacity {}", car.getName(), index);
+        while (index > 0) {
+            logger.info("Car {} still needs {} containers", car.getName(), index);
             port.removeContainer();
-            System.out.println("Containers {} in port right now" + port.getContainers());
+            logger.info("Containers in port right now: {}", port.getContainers().get());
             try {
                 TimeUnit.MILLISECONDS.sleep(500);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                logger.warn("Car {} interrupted during loading", car.getName());
             }
             index--;
         }
+        logger.info("Car {} finished loading process", car.getName());
     }
 }

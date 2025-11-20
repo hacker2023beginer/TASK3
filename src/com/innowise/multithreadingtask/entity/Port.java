@@ -1,18 +1,22 @@
 package com.innowise.multithreadingtask.entity;
 
+import com.innowise.multithreadingtask.exception.ShipThreadException;
 import com.innowise.multithreadingtask.state.impl.CarProcessLoadingState;
 import com.innowise.multithreadingtask.state.impl.CarProcessUnloadingState;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Port {
-    private List<Berth> birhtsJournal = new ArrayList<>();
+    private static final Logger logger = LogManager.getLogger(Port.class);
+
+    private Semaphore berthSemaphore;
+    private List<Berth> berthsJournal;
     private final Lock lock = new ReentrantLock();
     private final double CROWDED_FACTOR = 0.9;
     private final double EMPTY_FACTOR = 0.1;
@@ -21,15 +25,58 @@ public class Port {
     private AtomicInteger containers;
     private double loadFactor;
 
-    public void setBirhts(List<Berth> birhtsJournal) {
-        this.birhtsJournal = birhtsJournal;
+    public void setBerthsJournal(List<Berth> berthsJournal) {
+        this.berthsJournal = berthsJournal;
+        logger.info("Berths journal set with {} berths", berthsJournal.size());
+    }
+
+    public void setBerthSemaphore(Semaphore berthSemaphore) {
+        this.berthSemaphore = berthSemaphore;
+        logger.info("Berth semaphore initialized with {} permits", berthSemaphore.availablePermits());
+    }
+
+    public Berth acquireBerth() throws ShipThreadException {
+        try {
+            berthSemaphore.acquire();
+            logger.info("Semaphore acquired by thread {}", Thread.currentThread().getName());
+        } catch (InterruptedException e) {
+            logger.error("Semaphore acquire interrupted", e);
+            throw new ShipThreadException("Semaphore error");
+        }
+        lock.lock();
+        try {
+            for (Berth berth : berthsJournal) {
+                if (!berth.isOccupied()) {
+                    berth.occupy();
+                    logger.info("Berth {} occupied by thread {}", berth.getId(), Thread.currentThread().getName());
+                    return berth;
+                }
+            }
+            logger.warn("No free berth found for thread {}", Thread.currentThread().getName());
+            return null;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void releaseBerth(Berth berth) {
+        lock.lock();
+        try {
+            berth.release();
+            berthSemaphore.release();
+            logger.info("Berth {} released by thread {}", berth.getId(), Thread.currentThread().getName());
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void setContainers(AtomicInteger containers) {
         this.containers = containers;
+        logger.info("Containers initialized with {}", containers.get());
     }
 
     private Port() {
+        logger.info("Port instance created");
     }
 
     private static class PortHolder {
@@ -41,16 +88,21 @@ public class Port {
     }
 
     public void addContainer() {
-        containers.incrementAndGet();
-        double currentLoadFactor = getLoadFactor();
+        int newCount = containers.incrementAndGet();
+        logger.info("Container added. Total now: {}", newCount);
         lock.lock();
-        if (currentLoadFactor > CROWDED_FACTOR) {
-            int carCap = (int) (portCapacity * CAR_FACTOR);
-            Car newCar = new Car(carCap, this);
-            newCar.setState(new CarProcessLoadingState());
-            newCar.start();
+        try {
+            double currentLoadFactor = getLoadFactor();
+            if (currentLoadFactor > CROWDED_FACTOR) {
+                int carCap = (int) (portCapacity * CAR_FACTOR);
+                Car newCar = new Car(carCap, this);
+                newCar.setState(new CarProcessLoadingState());
+                newCar.start();
+                logger.info("Crowded factor exceeded. New Car {} started for loading with capacity {}", newCar.getName(), carCap);
+            }
+        } finally {
+            lock.unlock();
         }
-        lock.unlock();
     }
 
     public AtomicInteger getContainers() {
@@ -58,26 +110,33 @@ public class Port {
     }
 
     public void removeContainer() {
-        containers.decrementAndGet();
-        double currentLoadFactor = getLoadFactor();
+        int newCount = containers.decrementAndGet();
+        logger.info("Container removed. Total now: {}", newCount);
         lock.lock();
-        if (currentLoadFactor < EMPTY_FACTOR) {
-            int carCap = (int) (portCapacity * CAR_FACTOR);
-            Car newCar = new Car(carCap, this);
-            newCar.setState(new CarProcessUnloadingState());
-            newCar.start();
+        try {
+            double currentLoadFactor = getLoadFactor();
+            if (currentLoadFactor < EMPTY_FACTOR) {
+                int carCap = (int) (portCapacity * CAR_FACTOR);
+                Car newCar = new Car(carCap, this);
+                newCar.setState(new CarProcessUnloadingState());
+                newCar.start();
+                logger.info("Empty factor reached. New Car {} started for unloading with capacity {}", newCar.getName(), carCap);
+            }
+        } finally {
+            lock.unlock();
         }
-        lock.unlock();
     }
 
     public void setPortCapacity(int portCapacity) {
         this.portCapacity = portCapacity;
+        logger.info("Port capacity set to {}", portCapacity);
     }
 
     public double getLoadFactor() {
+        lock.lock();
         try {
-            lock.lock();
             loadFactor = (double) containers.get() / (double) portCapacity;
+            logger.debug("Current load factor: {}", loadFactor);
             return loadFactor;
         } finally {
             lock.unlock();

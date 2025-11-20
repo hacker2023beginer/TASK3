@@ -10,6 +10,7 @@ public class ShipProcessUnloadingState implements ShipProcessState {
     public void doProcess(Ship ship) {
         while (ship.getContainers() > 0) {
             ship.setContainers(ship.getContainers() - 1);
+            ship.getPort().addContainer();
             try {
                 TimeUnit.MILLISECONDS.sleep(500);
             } catch (InterruptedException e) {

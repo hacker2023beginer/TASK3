@@ -11,16 +11,22 @@ public class Ship extends Thread{
     private static final Logger logger = LogManager.getLogger();
     private static final AtomicInteger idCounter = new AtomicInteger(0);
 
+    private final Port port;
     private int shipId;
     private int containers;
     private int capacity;
     private ShipProcessState shipProcessState;
 
-    public Ship(int containers, int capacity, ShipProcessState shipProcessState) {
+    public Ship(int containers, int capacity, ShipProcessState shipProcessState, Port port) {
         this.shipId = idCounter.getAndIncrement();
         this.containers = containers;
         this.capacity = capacity;
         this.shipProcessState = shipProcessState;
+        this.port = port;
+    }
+
+    public Port getPort() {
+        return port;
     }
 
     public int getShipId() {

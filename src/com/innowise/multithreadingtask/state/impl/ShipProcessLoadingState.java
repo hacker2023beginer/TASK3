@@ -9,6 +9,7 @@ public class ShipProcessLoadingState implements ShipProcessState {
     @Override
     public void doProcess(Ship ship) {
         while (ship.getContainers() < ship.getCapacity()) {
+            ship.getPort().removeContainer();
             ship.setContainers(ship.getContainers() + 1);
             try {
                 TimeUnit.MILLISECONDS.sleep(500);

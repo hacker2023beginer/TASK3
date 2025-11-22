@@ -19,8 +19,9 @@ public class ShipProcessUnloadingState implements ShipProcessState {
             ship.getPort().addContainer();
             logger.info("Ship {} unloaded one container. Remaining on ship: {}. Containers in port: {}",
                     ship.getShipId(), ship.getContainers(), ship.getPort().getContainers().get());
+            logger.info("Port containers after loading: {}", ship.getPort().getContainers().get());
             try {
-                TimeUnit.MILLISECONDS.sleep(500);
+                TimeUnit.SECONDS.sleep(3);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 logger.warn("Ship {} interrupted during unloading", ship.getShipId());

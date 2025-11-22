@@ -21,7 +21,7 @@ public class CarProcessLoadingState implements CarProcessState {
             port.removeContainer();
             logger.info("Containers in port right now: {}", port.getContainers().get());
             try {
-                TimeUnit.MILLISECONDS.sleep(500);
+                TimeUnit.SECONDS.sleep(3);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 logger.warn("Car {} interrupted during loading", car.getName());

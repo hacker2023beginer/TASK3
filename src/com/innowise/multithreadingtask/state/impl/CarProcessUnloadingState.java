@@ -21,7 +21,7 @@ public class CarProcessUnloadingState implements CarProcessState {
             logger.info("Car {} unloaded one container. Containers in port now: {}",
                     car.getName(), port.getContainers().get());
             try {
-                TimeUnit.MILLISECONDS.sleep(500);
+                TimeUnit.SECONDS.sleep(3);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 logger.warn("Car {} interrupted during unloading", car.getName());

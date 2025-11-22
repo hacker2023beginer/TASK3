@@ -19,9 +19,9 @@ public class ShipProcessLoadingState implements ShipProcessState {
             ship.setContainers(ship.getContainers() + 1);
             logger.info("Ship {} loaded one container. Now has {}/{}",
                     ship.getShipId(), ship.getContainers(), ship.getCapacity());
-            logger.debug("Port containers after loading: {}", ship.getPort().getContainers().get());
+            logger.info("Port containers after loading: {}", ship.getPort().getContainers().get());
             try {
-                TimeUnit.MILLISECONDS.sleep(500);
+                TimeUnit.SECONDS.sleep(3);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 logger.warn("Ship {} interrupted during loading", ship.getShipId());

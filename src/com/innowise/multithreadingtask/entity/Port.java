@@ -27,18 +27,18 @@ public class Port {
 
     public void setBerthsJournal(List<Berth> berthsJournal) {
         this.berthsJournal = berthsJournal;
-        logger.info("Berths journal set with {} berths", berthsJournal.size());
+        logger.debug("Berths journal set with {} berths", berthsJournal.size());
     }
 
     public void setBerthSemaphore(Semaphore berthSemaphore) {
         this.berthSemaphore = berthSemaphore;
-        logger.info("Berth semaphore initialized with {} permits", berthSemaphore.availablePermits());
+        logger.debug("Berth semaphore initialized with {} permits", berthSemaphore.availablePermits());
     }
 
     public Berth acquireBerth() throws ShipThreadException {
         try {
             berthSemaphore.acquire();
-            logger.info("Semaphore acquired by thread {}", Thread.currentThread().getName());
+            logger.debug("Semaphore acquired by thread {}", Thread.currentThread().getName());
         } catch (InterruptedException e) {
             logger.error("Semaphore acquire interrupted", e);
             throw new ShipThreadException("Semaphore error");
@@ -64,7 +64,7 @@ public class Port {
         try {
             berth.release();
             berthSemaphore.release();
-            logger.info("Berth {} released by thread {}", berth.getId(), Thread.currentThread().getName());
+            logger.debug("Berth {} released by thread {}", berth.getId(), Thread.currentThread().getName());
         } finally {
             lock.unlock();
         }
@@ -72,11 +72,11 @@ public class Port {
 
     public void setContainers(AtomicInteger containers) {
         this.containers = containers;
-        logger.info("Containers initialized with {}", containers.get());
+        logger.debug("Containers initialized with {}", containers.get());
     }
 
     private Port() {
-        logger.info("Port instance created");
+        logger.debug("Port instance created");
     }
 
     private static class PortHolder {
@@ -89,7 +89,7 @@ public class Port {
 
     public void addContainer() {
         int newCount = containers.incrementAndGet();
-        logger.info("Container added. Total now: {}", newCount);
+        logger.debug("Container added. Total now: {}", newCount);
         lock.lock();
         try {
             double currentLoadFactor = getLoadFactor();
@@ -98,7 +98,7 @@ public class Port {
                 Car newCar = new Car(carCap, this);
                 newCar.setState(new CarProcessLoadingState());
                 newCar.start();
-                logger.info("Crowded factor exceeded. New Car {} started for loading with capacity {}", newCar.getName(), carCap);
+                logger.debug("Crowded factor exceeded. New Car {} started for loading with capacity {}", newCar.getName(), carCap);
             }
         } finally {
             lock.unlock();
@@ -111,7 +111,7 @@ public class Port {
 
     public void removeContainer() {
         int newCount = containers.decrementAndGet();
-        logger.info("Container removed. Total now: {}", newCount);
+        logger.debug("Container removed. Total now: {}", newCount);
         lock.lock();
         try {
             double currentLoadFactor = getLoadFactor();
@@ -120,7 +120,7 @@ public class Port {
                 Car newCar = new Car(carCap, this);
                 newCar.setState(new CarProcessUnloadingState());
                 newCar.start();
-                logger.info("Empty factor reached. New Car {} started for unloading with capacity {}", newCar.getName(), carCap);
+                logger.debug("Empty factor reached. New Car {} started for unloading with capacity {}", newCar.getName(), carCap);
             }
         } finally {
             lock.unlock();
@@ -129,7 +129,7 @@ public class Port {
 
     public void setPortCapacity(int portCapacity) {
         this.portCapacity = portCapacity;
-        logger.info("Port capacity set to {}", portCapacity);
+        logger.debug("Port capacity set to {}", portCapacity);
     }
 
     public double getLoadFactor() {

@@ -27,7 +27,7 @@ public class Berth {
 
     public void occupy() {
         occupied = true;
-        logger.info("Berth {} is now occupied", id);
+        logger.debug("Berth {} is now occupied", id);
     }
 
     public void release() {

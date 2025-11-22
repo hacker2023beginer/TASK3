@@ -49,12 +49,12 @@ public class Ship extends Thread {
     @Override
     public void run() {
         try {
-            logger.info("Ship {} attempting to acquire berth", shipId);
+            logger.debug("Ship {} attempting to acquire berth", shipId);
             Berth berth = port.acquireBerth();
-            logger.info("Ship {} acquired berth {}", shipId, berth.getId());
+            logger.debug("Ship {} acquired berth {}", shipId, berth.getId());
             shipProcessState.doProcess(this);
             port.releaseBerth(berth);
-            logger.info("Ship {} released berth {}", shipId, berth.getId());
+            logger.debug("Ship {} released berth {}", shipId, berth.getId());
         } catch (ShipThreadException e) {
             logger.error("Ship {} encountered error: {}", shipId, e.getMessage(), e);
         }
@@ -62,17 +62,17 @@ public class Ship extends Thread {
 
     public void setShipProcessState(ShipProcessState shipProcessState) {
         this.shipProcessState = shipProcessState;
-        logger.info("Ship {} state set to {}", shipId, shipProcessState.getClass().getSimpleName());
+        logger.debug("Ship {} state set to {}", shipId, shipProcessState.getClass().getSimpleName());
     }
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
-        logger.info("Ship {} capacity updated to {}", shipId, capacity);
+        logger.debug("Ship {} capacity updated to {}", shipId, capacity);
     }
 
     public void setContainers(int containers) {
         this.containers = containers;
-        logger.info("Ship {} containers updated to {}", shipId, containers);
+        logger.debug("Ship {} containers updated to {}", shipId, containers);
     }
 
     public void setShipId(int shipId) {

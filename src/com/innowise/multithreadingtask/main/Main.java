@@ -14,8 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         Port port = Port.getInstance();
-        port.setPortCapacity(20);
-        port.setContainers(new AtomicInteger(20));
+        port.setPortCapacity(50);
+        port.setContainers(new AtomicInteger(25));
         port.setBerthsJournal(Arrays.asList(new Berth(), new Berth(), new Berth()));
         port.setBerthSemaphore(new Semaphore(3));
 
@@ -39,7 +39,5 @@ public class Main {
         for (Ship ship : ships) {
             ship.join();
         }
-
-        System.out.println("Все корабли завершили работу");
     }
 }

@@ -1,7 +1,7 @@
 package com.innowise.multithreadingtask.entity;
 
 import com.innowise.multithreadingtask.exception.ShipThreadException;
-import com.innowise.multithreadingtask.state.ShipProcessState;
+import com.innowise.multithreadingtask.state.ShipProcessCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,13 +15,13 @@ public class Ship extends Thread {
     private int shipId;
     private int containers;
     private int capacity;
-    private ShipProcessState shipProcessState;
+    private ShipProcessCommand shipProcessCommand;
 
-    public Ship(int containers, int capacity, ShipProcessState shipProcessState, Port port) {
+    public Ship(int containers, int capacity, ShipProcessCommand shipProcessCommand, Port port) {
         this.shipId = idCounter.getAndIncrement();
         this.containers = containers;
         this.capacity = capacity;
-        this.shipProcessState = shipProcessState;
+        this.shipProcessCommand = shipProcessCommand;
         this.port = port;
         logger.info("Ship {} created with {} containers and capacity {}", shipId, containers, capacity);
     }
@@ -42,8 +42,8 @@ public class Ship extends Thread {
         return capacity;
     }
 
-    public ShipProcessState getShipProcessState() {
-        return shipProcessState;
+    public ShipProcessCommand getShipProcessState() {
+        return shipProcessCommand;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class Ship extends Thread {
             logger.debug("Ship {} attempting to acquire berth", shipId);
             Berth berth = port.acquireBerth();
             logger.debug("Ship {} acquired berth {}", shipId, berth.getId());
-            shipProcessState.doProcess(this);
+            shipProcessCommand.doProcess(this);
             port.releaseBerth(berth);
             logger.debug("Ship {} released berth {}", shipId, berth.getId());
         } catch (ShipThreadException e) {
@@ -60,9 +60,9 @@ public class Ship extends Thread {
         }
     }
 
-    public void setShipProcessState(ShipProcessState shipProcessState) {
-        this.shipProcessState = shipProcessState;
-        logger.debug("Ship {} state set to {}", shipId, shipProcessState.getClass().getSimpleName());
+    public void setShipProcessCommand(ShipProcessCommand shipProcessCommand) {
+        this.shipProcessCommand = shipProcessCommand;
+        logger.debug("Ship {} state set to {}", shipId, shipProcessCommand.getClass().getSimpleName());
     }
 
     public void setCapacity(int capacity) {

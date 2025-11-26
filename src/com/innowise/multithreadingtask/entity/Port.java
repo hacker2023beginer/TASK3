@@ -1,8 +1,8 @@
 package com.innowise.multithreadingtask.entity;
 
 import com.innowise.multithreadingtask.exception.ShipThreadException;
-import com.innowise.multithreadingtask.state.impl.CarProcessLoadingState;
-import com.innowise.multithreadingtask.state.impl.CarProcessUnloadingState;
+import com.innowise.multithreadingtask.state.impl.CarProcessLoadingCommand;
+import com.innowise.multithreadingtask.state.impl.CarProcessUnloadingCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -96,7 +96,7 @@ public class Port {
             if (currentLoadFactor > CROWDED_FACTOR) {
                 int carCap = (int) (portCapacity * CAR_FACTOR);
                 Car newCar = new Car(carCap, this);
-                newCar.setState(new CarProcessLoadingState());
+                newCar.setCarProcessCommand(new CarProcessLoadingCommand());
                 newCar.start();
                 logger.debug("Crowded factor exceeded. New Car {} started for loading with capacity {}", newCar.getName(), carCap);
             }
@@ -118,7 +118,7 @@ public class Port {
             if (currentLoadFactor < EMPTY_FACTOR) {
                 int carCap = (int) (portCapacity * CAR_FACTOR);
                 Car newCar = new Car(carCap, this);
-                newCar.setState(new CarProcessUnloadingState());
+                newCar.setCarProcessCommand(new CarProcessUnloadingCommand());
                 newCar.start();
                 logger.debug("Empty factor reached. New Car {} started for unloading with capacity {}", newCar.getName(), carCap);
             }

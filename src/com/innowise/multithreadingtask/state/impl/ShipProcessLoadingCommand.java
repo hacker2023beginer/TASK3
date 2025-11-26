@@ -1,14 +1,14 @@
 package com.innowise.multithreadingtask.state.impl;
 
 import com.innowise.multithreadingtask.entity.Ship;
-import com.innowise.multithreadingtask.state.ShipProcessState;
+import com.innowise.multithreadingtask.state.ShipProcessCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.TimeUnit;
 
-public class ShipProcessLoadingState implements ShipProcessState {
-    private static final Logger logger = LogManager.getLogger(ShipProcessLoadingState.class);
+public class ShipProcessLoadingCommand implements ShipProcessCommand {
+    private static final Logger logger = LogManager.getLogger(ShipProcessLoadingCommand.class);
 
     @Override
     public void doProcess(Ship ship) {

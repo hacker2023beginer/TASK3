@@ -1,6 +1,6 @@
 package com.innowise.multithreadingtask.entity;
 
-import com.innowise.multithreadingtask.state.CarProcessState;
+import com.innowise.multithreadingtask.state.CarProcessCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -9,7 +9,7 @@ public class Car extends Thread {
 
     private int carCapacity;
     private final Port port;
-    private CarProcessState state;
+    private CarProcessCommand carProcessCommand;
 
     public Car(int capCapacity, Port port) {
         this.carCapacity = capCapacity;
@@ -33,12 +33,12 @@ public class Car extends Thread {
     @Override
     public void run() {
         logger.info("Car {} started process with capacity {}", getName(), carCapacity);
-        state.doProcess(this);
+        carProcessCommand.doProcess(this);
         logger.info("Car {} finished process", getName());
     }
 
-    public void setState(CarProcessState state) {
-        this.state = state;
+    public void setCarProcessCommand(CarProcessCommand state) {
+        this.carProcessCommand = state;
         logger.info("Car {} state set to {}", getName(), state.getClass().getSimpleName());
     }
 }

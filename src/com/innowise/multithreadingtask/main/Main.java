@@ -3,8 +3,8 @@ package com.innowise.multithreadingtask.main;
 import com.innowise.multithreadingtask.entity.Berth;
 import com.innowise.multithreadingtask.entity.Port;
 import com.innowise.multithreadingtask.entity.Ship;
-import com.innowise.multithreadingtask.state.impl.ShipProcessLoadingState;
-import com.innowise.multithreadingtask.state.impl.ShipProcessUnloadingState;
+import com.innowise.multithreadingtask.state.impl.ShipProcessLoadingCommand;
+import com.innowise.multithreadingtask.state.impl.ShipProcessUnloadingCommand;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,18 +20,18 @@ public class Main {
         port.setBerthSemaphore(new Semaphore(3));
 
         List<Ship> ships = Arrays.asList(
-                new Ship(1, 2, new ShipProcessLoadingState(), port),
-                new Ship(0, 5, new ShipProcessLoadingState(), port),
-                new Ship(6, 6, new ShipProcessUnloadingState(), port),
-                new Ship(1, 2, new ShipProcessLoadingState(), port),
-                new Ship(3, 5, new ShipProcessLoadingState(), port),
-                new Ship(6, 6, new ShipProcessUnloadingState(), port),
-                new Ship(1, 2, new ShipProcessLoadingState(), port),
-                new Ship(4, 5, new ShipProcessLoadingState(), port),
-                new Ship(1, 6, new ShipProcessUnloadingState(), port),
-                new Ship(1, 2, new ShipProcessLoadingState(), port),
-                new Ship(0, 5, new ShipProcessLoadingState(), port),
-                new Ship(6, 6, new ShipProcessUnloadingState(), port)
+                new Ship(1, 2, new ShipProcessLoadingCommand(), port),
+                new Ship(0, 5, new ShipProcessLoadingCommand(), port),
+                new Ship(6, 6, new ShipProcessUnloadingCommand(), port),
+                new Ship(1, 2, new ShipProcessLoadingCommand(), port),
+                new Ship(3, 5, new ShipProcessLoadingCommand(), port),
+                new Ship(6, 6, new ShipProcessUnloadingCommand(), port),
+                new Ship(1, 2, new ShipProcessLoadingCommand(), port),
+                new Ship(4, 5, new ShipProcessLoadingCommand(), port),
+                new Ship(1, 6, new ShipProcessUnloadingCommand(), port),
+                new Ship(1, 2, new ShipProcessLoadingCommand(), port),
+                new Ship(0, 5, new ShipProcessLoadingCommand(), port),
+                new Ship(6, 6, new ShipProcessUnloadingCommand(), port)
         );
 
         ships.forEach(Thread::start);

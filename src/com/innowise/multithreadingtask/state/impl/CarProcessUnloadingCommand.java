@@ -2,14 +2,14 @@ package com.innowise.multithreadingtask.state.impl;
 
 import com.innowise.multithreadingtask.entity.Car;
 import com.innowise.multithreadingtask.entity.Port;
-import com.innowise.multithreadingtask.state.CarProcessState;
+import com.innowise.multithreadingtask.state.CarProcessCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.TimeUnit;
 
-public class CarProcessUnloadingState implements CarProcessState {
-    private static final Logger logger = LogManager.getLogger(CarProcessUnloadingState.class);
+public class CarProcessUnloadingCommand implements CarProcessCommand {
+    private static final Logger logger = LogManager.getLogger(CarProcessUnloadingCommand.class);
 
     @Override
     public void doProcess(Car car) {
